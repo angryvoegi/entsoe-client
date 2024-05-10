@@ -279,6 +279,21 @@ def get_reason(Period: etree._Element) -> Dict:
     return data
 
 
+def get_createdatetime(Period: etree._Element) -> Dict:
+    """
+    Get the creation Date Time
+    """
+    created = Period.xpath("./createdDateTime", namespaces=Period.nsmap)
+    docstat = Period.xpath("./docStatus/value", namespaces=Period.nsmap)
+    revision = Period.xpath("./revisionNumber", namespaces=Period.nsmap)
+    resolution = Period.xpath("//TimeSeries/Available_Period/resolution", namespaces=Period.nsmap)
+    data = {'CreatedDateTime': str(created[0]) if len(created) == 1 else None,
+            'DocStatus': str(docstat[0]) if len(docstat) == 1 else None,
+            'RevisionNumber': str(revision[0]) if len(revision) == 1 else None,
+            'Resolution': str(resolution_map[resolution[0]]) if len(resolution) == 1 else None}
+    return data
+
+
 def outage_transmission() -> Callable:
     def outage_dataframe(Period: etree._Element) -> pd.DataFrame:
         """
@@ -290,10 +305,11 @@ def outage_transmission() -> Callable:
         resource = get_resource(Period=Period)
         infos = get_infos(Period=Period)
         reason = get_reason(Period=Period)
+        created = get_createdatetime(Period=Period)
         if resource is not None:
-            final = df.assign(**{**resource, **infos, **reason})
+            final = df.assign(**{**resource, **infos, **reason, **created})
         else:
-            final = df.assign(**{**infos, **reason})
+            final = df.assign(**{**infos, **reason, **created})
         return final
     return outage_dataframe
 
