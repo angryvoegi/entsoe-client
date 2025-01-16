@@ -29,4 +29,4 @@ class PsrType(str, ParameterEnum):
     B22 = ("DC Link",)
     B23 = ("Substation",)
     B24 = ("Transformer",)
-    B25 = ("Energy Storage")
+    B25 = "Energy Storage"
